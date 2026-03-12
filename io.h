@@ -10,18 +10,18 @@
 /**
  * @brief Đọc dữ liệu từ file stations.csv và nhóm vào vector các Station.
  */
-vector<Station> readStationsFromCSV(const string &filename);
+std::vector<Station> readStationsFromCSV(const std::string &filename);
 
 /**
  * @brief Ghi báo cáo thống kê định dạng CSV cho từng trạm.
  */
-void writeStationReport(const string &filename, const Station &s);
+void writeStationReport(std::ofstream &file, const Station &s);
 
 /**
  * @brief Ghi các đoạn dữ liệu bất thường (từ Kadane và LIS) vào file TXT.
  */
-void writeAnomalyReport(const string &filename, const Station &s, 
-                        const vector<Record> &hotDays, 
-                        const vector<Record> &rainTrend);
+void writeAnomalyReport(std::ofstream &file, const Station &s, 
+                        const std::vector<Record> &hotDays, 
+                        const std::vector<Record> &rainTrend);
 
 #endif
