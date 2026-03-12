@@ -1,1 +1,20 @@
-/.vscode
+# === Build Outputs ===
+*.exe
+*.out
+*.app
+main
+
+# === Object Files ===
+*.o
+*.obj
+
+# === Project Data & Reports ===
+station_report.csv
+anomaly.txt
+
+# === IDE & OS Junk ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
