@@ -44,7 +44,15 @@ Nhóm áp dụng các kỹ thuật xử lý mảng/dãy con tối ưu:
 - **Chuẩn hoá Z-score**: Sử dụng công thức $z = \frac{x - \mu}{\sigma}$ để đánh giá mức độ bất thường của nhiệt độ.
 
 ## 6. Kế hoạch kiểm thử (Testing Plan)
-Hệ thống sẽ thực hiện kiểm thử với ít nhất 3 bộ dữ liệu:
-- Test Case 1 (Dữ liệu thường): Dữ liệu chuẩn từ trạm khí tượng thực tế.
-- Test Case 2 (Dữ liệu biên): Trạm có 0 bản ghi, toàn bộ dữ liệu là NA, hoặc chỉ có 1 ngày đo duy nhất.
-- Test Case 3 (Dữ liệu lớn): Kiểm tra hiệu năng xử lý khi có hàng nghìn bản ghi trên nhiều trạm khác nhau.
+Hệ thống sẽ thực hiện kiểm thử với 4 bộ dữ liệu:
+
+| Mã Test | File Test | Trạm | Nội dung | Mục đích |
+|---------|-----------|------|---------|----------|
+| TC1 | `test_hanoi_normal.csv` | Tram_Ha_Noi | 30 ngày (01/01-29/01), dữ liệu đầy đủ không NA, nhiệt độ 15.4-39.6°C, mưa 1.2-19.6mm | Kiểm thử dữ liệu thường, toàn bộ hàm xử lý |
+| TC2 | `test_sapa_edge_cases.csv` | Tram_Sapa | 3 ngày: ngày 1 toàn NA, ngày 2 có NA humidity, ngày 3 có NA humidity | Kiểm thử xử lý dữ liệu thiếu (NA handling), trạm biên (edge cases) |
+| TC3 | `test_hue_lis.csv` | Tram_Hue | 10 ngày, nhiệt độ cố định 25°C, lượng mưa tăng dần (5.0→27.5mm), có 1 NA | Kiểm thử thuật toán **LIS** (Longest Increasing Subsequence) với xu hướng tăng rõ ràng |
+| TC4 | `test_dalat_stress.csv` | Tram_Da_Lat | 30 ngày, lượng mưa cao (0.8-48.4mm), nhiệt độ 10.4-27.4°C | Kiểm thử **Kadane** và xử lý lớn, phát hiện bất thường nhiệt độ (stress test) |
+
+**Kỳ vọng Output**: 
+- Ghi lại `station_report.csv` với các chỉ số thống kê (mean, std, min, max).
+- Ghi lại `anomaly.txt` chứa danh sách các đoạn bất thường theo từng trạm.

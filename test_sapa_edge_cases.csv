@@ -1,0 +1,4 @@
+ID,Name,Date,Temperature,Humidity,Rain
+2,Tram_Sapa,2025-01-01,NA,NA,NA
+2,Tram_Sapa,2025-01-02,-5.5,80.0,0.0
+2,Tram_Sapa,2025-01-03,10.0,NA,15.0
