@@ -17,7 +17,6 @@ double runKadane(const vector<double>& data, int& start, int& end) {
     start = 0;
     end = 0;
 
-    // Sửa cảnh báo type mismatch: int -> size_t
     for (size_t i = 1; i < data.size(); i++) {
         if (data[i] > max_ending_here + data[i]) {
             max_ending_here = data[i];
@@ -36,7 +35,7 @@ double runKadane(const vector<double>& data, int& start, int& end) {
 }
 
 int runLIS(const vector<double>& data, int& start, int& end){
-    size_t n = data.size(); // Sửa int -> size_t
+    size_t n = data.size();
     if (n == 0) return 0;
     int maxL = 1, currentL = 1;
     int tempStart = 0;
@@ -136,7 +135,6 @@ string classifyRainLevel(double rainAmount){
 }
 
 // Task 3
-// Đã xóa bỏ phần khai báo nguyên mẫu hàm (prototype) thừa thãi ở đây
 
 vector<Record> findMaxTempSegment(const Station &s) {
     vector<double> temps;

@@ -22,7 +22,6 @@ vector<Station> readStationsFromCSV(const string &filename) {
     getline(file, line); // Bỏ qua dòng header 
 
     while (getline(file, line)) {
-        // Loại bỏ ký tự \r ở cuối dòng (nếu có) để tránh lỗi định dạng chuỗi
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }

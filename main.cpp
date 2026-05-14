@@ -8,6 +8,11 @@ using namespace std;
 
 int main() {
     // 1. Đọc dữ liệu
+    cout << "Dang doc du lieu tu file stations.csv..." << endl;
+    // vector<Station> database = readStationsFromCSV("test_dalat_stress.csv");
+    // vector<Station> database = readStationsFromCSV("test_hanoi_normal.csv");
+    // vector<Station> database = readStationsFromCSV("test_hue_lis.csv");
+    // vector<Station> database = readStationsFromCSV("test_sapa_edge_cases.csv");
     vector<Station> database = readStationsFromCSV("stations.csv");
 
     // Mở file một lần duy nhất, chế độ ghi đè (tự động làm mới file mỗi lần chạy)
@@ -42,6 +47,6 @@ int main() {
     // Đóng file sau khi đã xử lý xong toàn bộ các trạm
     reportFile.close();
     anomalyFile.close();
-
+    cout << "Da xuat bao cao vao station_report.csv va anomaly.txt" << endl;
     return 0;
 }
