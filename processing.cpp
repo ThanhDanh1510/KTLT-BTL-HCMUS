@@ -59,20 +59,33 @@ int runLIS(const vector<double>& data, int& start, int& end){
 
 vector<double> computePrefixSum(const vector<double>& data){
     vector<double> prefix(data.size() + 1, 0);
-    // Sửa cảnh báo type mismatch: int -> size_t
     for (size_t i = 0; i < data.size(); i++) {
         prefix[i + 1] = prefix[i] + data[i];
     }
     return prefix;
 }
 
+double queryRangeSum(const vector<double>& prefix, int left, int right) {
+    if (left < 0 || right < left || static_cast<size_t>(right + 1) >= prefix.size()) {
+        return NAN;
+    }
+    return prefix[right + 1] - prefix[left];
+}
+
 // Task 2
 
 void calculateStationStats(Station &s){
+    s.stats.meanTemp = NAN;
+    s.stats.stdTemp = NAN;
+    s.stats.meanRain = NAN;
+    s.stats.stdRain = NAN;
+    s.stats.minVal = NAN;
+    s.stats.maxVal = NAN;
+
     if (s.records.empty()) return;
 
     double sumTemp = 0, sumRain = 0;
-    int countTemp = 0, countRain = 0; // Tách riêng biến đếm để tính toán độc lập
+    int countTemp = 0, countRain = 0;
     bool firstTemp = true;
 
     for (const auto& r : s.records) {
@@ -96,9 +109,12 @@ void calculateStationStats(Station &s){
         }
     }
 
-    // Tính trung bình an toàn (tránh chia cho 0)
-    s.stats.meanTemp = (countTemp > 0) ? (sumTemp / countTemp) : 0;
-    s.stats.meanRain = (countRain > 0) ? (sumRain / countRain) : 0;
+    if (countTemp > 0) {
+        s.stats.meanTemp = sumTemp / countTemp;
+    }
+    if (countRain > 0) {
+        s.stats.meanRain = sumRain / countRain;
+    }
 
     double varTemp = 0, varRain = 0;
     for (const auto& r : s.records) {
@@ -110,9 +126,12 @@ void calculateStationStats(Station &s){
         }
     }
     
-    // Tính độ lệch chuẩn an toàn
-    s.stats.stdTemp = (countTemp > 0) ? sqrt(varTemp / countTemp) : 0;
-    s.stats.stdRain = (countRain > 0) ? sqrt(varRain / countRain) : 0;
+    if (countTemp > 0) {
+        s.stats.stdTemp = sqrt(varTemp / countTemp);
+    }
+    if (countRain > 0) {
+        s.stats.stdRain = sqrt(varRain / countRain);
+    }
 }
 
 void normalizeStationData(Station &s){
@@ -152,7 +171,7 @@ vector<Record> findMaxTempSegment(const Station &s) {
     runKadane(temps, start, end);
 
     vector<Record> result;
-    if (start <= end && start >= 0 && end < temps.size()) {
+    if (start <= end && start >= 0 && static_cast<size_t>(end) < temps.size()) {
         for (int i = start; i <= end; i++) {
             result.push_back(s.records[valid_indices[i]]);
         }
@@ -160,9 +179,10 @@ vector<Record> findMaxTempSegment(const Station &s) {
     return result;
 }
 
-vector<Record> findLongestRainTrend(const Station &s) {
+vector<Record> findLongestRainTrend(const Station &s, double &trendTotalRain) {
     vector<double> rains;
     vector<int> valid_indices; 
+    trendTotalRain = NAN;
     
     // Trích xuất mảng lượng mưa, dùng isnan để bảo vệ thuật toán
     for (size_t i = 0; i < s.records.size(); i++) {
@@ -176,7 +196,9 @@ vector<Record> findLongestRainTrend(const Station &s) {
     runLIS(rains, start, end);
 
     vector<Record> result;
-    if (start <= end && start >= 0 && end < rains.size()) {
+    if (start <= end && start >= 0 && static_cast<size_t>(end) < rains.size()) {
+        vector<double> prefix = computePrefixSum(rains);
+        trendTotalRain = queryRangeSum(prefix, start, end);
         for (int i = start; i <= end; i++) {
             result.push_back(s.records[valid_indices[i]]);
         }

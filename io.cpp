@@ -9,6 +9,13 @@ string trim(const string& s) {
     return s.substr(first, (last - first + 1));
 }
 
+string formatNumber(double value) {
+    if (isnan(value)) return "NA";
+    ostringstream oss;
+    oss << value;
+    return oss.str();
+}
+
 vector<Station> readStationsFromCSV(const string &filename) {
     vector<Station> database;
     ifstream file(filename);
@@ -45,8 +52,6 @@ vector<Station> readStationsFromCSV(const string &filename) {
 
         Record rec;
         rec.date = date;
-        rec.valid = true;
-        
         rec.temp = (temp_str == "NA" || temp_str.empty()) ? NAN : stod(temp_str);
         rec.humidity = (hum_str == "NA" || hum_str.empty()) ? NAN : stod(hum_str);
         rec.rain = (rain_str == "NA" || rain_str.empty()) ? NAN : stod(rain_str);
@@ -80,14 +85,14 @@ vector<Station> readStationsFromCSV(const string &filename) {
 void writeStationReport(ofstream &file, const Station &s) {
     file << s.id << "," 
          << s.name << "," 
-         << s.stats.meanTemp << "," 
-         << s.stats.maxVal << "\n";
+         << formatNumber(s.stats.meanTemp) << "," 
+         << formatNumber(s.stats.maxVal) << "\n";
 }
 
 void writeAnomalyReport(ofstream &file, const Station &s, 
                         const vector<Record> &hotDays, 
-                        const vector<Record> &rainTrend) {
-    // Ghi trực tiếp vào file đã được mở
+                        const vector<Record> &rainTrend,
+                        double rainTrendTotal) {
     file << "--------------------------------------------------\n";
     file << "TRAM: " << s.name << " (ID: " << s.id << ")\n";
 
@@ -100,5 +105,6 @@ void writeAnomalyReport(ofstream &file, const Station &s,
     for (const auto& r : rainTrend) {
         file << "  " << r.date << ": " << r.rain << " mm (" << classifyRainLevel(r.rain) << ")\n";
     }
+    file << "  Tong luong mua tren chuoi [Prefix Sum 1D]: " << formatNumber(rainTrendTotal) << " mm\n";
     file << "--------------------------------------------------\n\n";
 }

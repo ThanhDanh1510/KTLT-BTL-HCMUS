@@ -10,7 +10,6 @@ struct Record {
     double temp;         // Nhiệt độ
     double humidity;     // Độ ẩm
     double rain;         // Lượng mưa
-    bool valid;          // Trạng thái dữ liệu 
 };
 
 struct Stats {
@@ -53,6 +52,11 @@ int runLIS(const std::vector<double>& data, int& start, int& end);
  */
 std::vector<double> computePrefixSum(const std::vector<double>& data);
 
+/**
+ * @brief Truy vấn tổng đoạn [left, right] trên mảng prefix sum trong O(1)
+ */
+double queryRangeSum(const std::vector<double>& prefix, int left, int right);
+
 // =========================================================
 // NHÓM 2: CÁC HÀM THAO TÁC TRÊN STRUCT
 // =========================================================
@@ -71,7 +75,7 @@ std::vector<Record> findMaxTempSegment(const Station &s);
 /**
  * @brief Tìm chuỗi ngày lượng mưa tăng dần liên tiếp (Sử dụng hàm runLIS nội bộ)
  */
-std::vector<Record> findLongestRainTrend(const Station &s);
+std::vector<Record> findLongestRainTrend(const Station &s, double &trendTotalRain);
 
 /**
  * @brief Chuẩn hoá dữ liệu chuỗi (trim khoảng trắng ở tên),  

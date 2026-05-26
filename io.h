@@ -22,6 +22,7 @@ void writeStationReport(std::ofstream &file, const Station &s);
  */
 void writeAnomalyReport(std::ofstream &file, const Station &s, 
                         const std::vector<Record> &hotDays, 
-                        const std::vector<Record> &rainTrend);
+                        const std::vector<Record> &rainTrend,
+                        double rainTrendTotal);
 
 #endif

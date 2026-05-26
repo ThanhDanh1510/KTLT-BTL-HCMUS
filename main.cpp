@@ -37,11 +37,12 @@ int main() {
 
         // 3. Phân tích thuật toán
         vector<Record> hotDays = findMaxTempSegment(s);
-        vector<Record> rainTrend = findLongestRainTrend(s);
+        double rainTrendTotal = NAN;
+        vector<Record> rainTrend = findLongestRainTrend(s, rainTrendTotal);
         
         // 4. Xuất kết quả qua luồng file
         writeStationReport(reportFile, s);
-        writeAnomalyReport(anomalyFile, s, hotDays, rainTrend);
+        writeAnomalyReport(anomalyFile, s, hotDays, rainTrend, rainTrendTotal);
     }
 
     // Đóng file sau khi đã xử lý xong toàn bộ các trạm
