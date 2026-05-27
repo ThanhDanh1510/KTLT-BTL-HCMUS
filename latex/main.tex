@@ -1,0 +1,53 @@
+\documentclass[12pt]{article}
+\input{setup.tex} % Gọi file setup đã tối ưu
+
+\setlength{\parindent}{0pt}
+
+% Line spacing 1.5
+\renewcommand{\baselinestretch}{1.5}
+
+% Optional: graphic path
+\graphicspath{{figure/}}
+
+% To use Times font family, uncomment this row
+% \usepackage{mathptmx}
+
+% To use roman section / subsection, uncomment these rows
+% \renewcommand{\thesection}{\Roman{section}}
+% \renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+
+% Define course name, report name and report title.
+\newcommand{\coursename}{Kỹ thuật lập trình (MTH10107)}
+\newcommand{\reportname}{Hệ thống phân tích dữ liệu thời tiết nhiều trạm đo}
+\newcommand{\reporttitle}{Báo cáo Bài Tập Thực Hành Kỹ thuật lập trình}
+
+\newcommand{\studentname}{Lưu Thành Danh (24280055)}
+
+% Header
+\lhead{\reporttitle}
+\rhead{
+Trường Đại học Khoa học Tự nhiên - ĐHQG HCM\\
+\coursename
+}
+
+\begin{document}
+\pagenumbering{roman}
+\input{title.tex}
+% --- MỤC LỤC TỰ ĐỘNG ---
+\newpage
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+\input{introduction.tex}
+\newpage
+\input{architecture.tex}
+\newpage
+\input{algorithms.tex}
+\newpage
+\input{implementation.tex}
+\newpage
+\input{testing.tex}
+\newpage
+\input{conclusion.tex}
+\end{document}

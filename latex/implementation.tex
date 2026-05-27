@@ -1,0 +1,123 @@
+\section{Hiện thực hóa và Đặc tả chi tiết hàm}
+
+\subsection{Cấu trúc thư mục nguồn (Source Code Directory)}
+Mã nguồn của chương trình được tổ chức khoa học, tách biệt hoàn toàn giữa phần định nghĩa (Header files) và phần cài đặt chi tiết (Source files), giúp tối ưu hóa quá trình biên dịch và tăng khả năng tái sử dụng.
+\begin{verbatim}
+KTLT BTL HCMUS/
+|
++-- cpp/
+|   +-- main.cpp            # Bo dieu phoi luong xu ly chinh
+|   +-- io.h                # Khai bao cac nguyen mau ham nhap xuat
+|   +-- io.cpp              # Hien thuc chi tiet ham doc/ghi file CSV, TXT
+|   +-- processing.h        # Dinh nghia Struct va nguyen mau ham
+|   +-- processing.cpp      # Hien thuc thuat toan (Kadane, LIS, Prefix Sum)
+|
++-- latex/
+|   +-- main.tex            # Tep cau hinh chinh va lien ket bao cao
+|   +-- setup.tex           # Chua cac goi lenh va cau hinh style
+|   +-- title.tex           # Trang bia bao cao
+|   +-- figure/             # Thu muc chua hinh anh bao cao
+|   |   +-- workflow.png
+|   |   +-- Weather_station_data_model.png
+|   |   +-- composite.png
+|   +-- [cac file .tex phan doan]
+|
++-- stations.csv            # Co so du lieu thoi tiet dau vao
++-- [bo du lieu test]       # test_hanoi_normal.csv, ...
+\end{verbatim}
+
+\subsection{Bảng đặc tả chi tiết các hàm trong hệ thống}
+Dưới đây là đặc tả chi tiết của các hàm cốt lõi thuộc hai module chính \texttt{IO} và \texttt{Processing}:
+
+\begin{table}[H]
+    \centering
+    \caption{Đặc tả các hàm thành viên trong hệ thống}
+    \footnotesize
+    \begin{tabularx}{\textwidth}{l|p{3.8cm}|p{3.5cm}|X}
+        \toprule
+        \textbf{Tên hàm} & \textbf{Tham số đầu vào} & \textbf{Kết quả trả về} & \textbf{Mô tả nhiệm vụ} \\
+        \midrule
+        \texttt{readStationsFromCSV} & \texttt{const string \&filename} & \texttt{vector<Station>} & Đọc tệp CSV, phân tích chuỗi, chuyển \texttt{NA} sang \texttt{NAN}, nhóm bản ghi vào đúng trạm. \\ \hline
+        \texttt{normalizeStationData} & \texttt{Station \&s} & \texttt{void} & Chuẩn hóa dữ liệu chuỗi của trạm (cắt bỏ khoảng trắng thừa đầu/cuối ở tên trạm). \\ \hline
+        \texttt{calculateStationStats} & \texttt{Station \&s} & \texttt{void} & Tính toán các chỉ số trung bình, độ lệch chuẩn, cực trị cho trạm. \\ \hline
+        \texttt{findMaxTempSegment} & \texttt{const Station \&s} & \texttt{vector<Record>} & Áp dụng thuật toán Kadane lọc đoạn ngày nắng nóng cao nhất của trạm. \\ \hline
+        \texttt{findLongestRainTrend} & \texttt{const Station \&s, double \&trendTotalRain} & \texttt{vector<Record>} & Tìm đoạn lượng mưa tăng liên tục bằng LIS, trả tổng lượng mưa qua tham chiếu. \\ \hline
+        \texttt{computePrefixSum} & \texttt{const vector<double> \&data} & \texttt{vector<double>} & Xây dựng mảng cộng dồn cho mảng lượng mưa thực tế. \\ \hline
+        \texttt{queryRangeSum} & \texttt{const vector<double> \&prefix, int left, int right} & \texttt{double} & Truy vấn tổng đoạn lượng mưa trong thời gian hằng số $O(1)$. \\ \hline
+        \texttt{classifyRainLevel} & \texttt{double rainAmount} & \texttt{string} & Phân loại lượng mưa: \textit{No Rain}, \textit{Light}, \textit{Moderate}, \textit{Heavy}. \\ \hline
+        \texttt{writeStationReport} & \texttt{ofstream \&file, const Station \&s} & \texttt{void} & Ghi báo cáo định dạng CSV của trạm đo. \\ \hline
+        \texttt{writeAnomalyReport} & \texttt{ofstream \&file, const Station \&s...} & \texttt{void} & Xuất các đoạn thời tiết bất thường (Kadane và LIS) ra tệp văn bản. \\
+        \bottomrule
+    \end{tabularx}
+    \label{tab:functions}
+\end{table}
+
+\subsection{Hiện thực hóa các thuật toán cốt lõi bằng C++}
+Dưới đây là một số đoạn mã nguồn thực tế được trích xuất từ \texttt{processing.cpp} thể hiện việc cài đặt tối ưu thuật toán Kadane và LIS liên tiếp:
+
+\subsubsection{Cài đặt thuật toán Kadane}
+\begin{lstlisting}[style=cppstyle, caption=Hàm runKadane trong processing.cpp]
+double runKadane(const std::vector<double>& data, int& start, int& end) {
+    double max_so_far = -9999999.0; // Hoặc -INFINITY
+    double max_ending_here = 0.0;
+    int temp_start = 0;
+    start = 0; end = 0;
+    bool hasValid = false;
+
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (std::isnan(data[i])) {
+            max_ending_here = 0.0;
+            temp_start = i + 1;
+            continue;
+        }
+        hasValid = true;
+        max_ending_here += data[i];
+
+        if (max_ending_here > max_so_far) {
+            max_so_far = max_ending_here;
+            start = temp_start;
+            end = i;
+        }
+        if (max_ending_here < 0.0) {
+            max_ending_here = 0.0;
+            temp_start = i + 1;
+        }
+    }
+    return hasValid ? max_so_far : NAN;
+}
+\end{lstlisting}
+
+\subsubsection{Cài đặt thuật toán LIS liên tiếp và Prefix Sum}
+\begin{lstlisting}[style=cppstyle, caption=Hàm runLIS trong processing.cpp]
+int runLIS(const std::vector<double>& data, int& start, int& end) {
+    int max_len = 0;
+    int curr_len = 0;
+    int temp_start = 0;
+    start = -1; end = -1;
+
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (std::isnan(data[i])) {
+            curr_len = 0;
+            temp_start = i + 1;
+            continue;
+        }
+        if (curr_len == 0) {
+            curr_len = 1;
+            temp_start = i;
+        } else {
+            if (data[i] > data[i - 1] && !std::isnan(data[i - 1])) {
+                curr_len++;
+            } else {
+                curr_len = 1;
+                temp_start = i;
+            }
+        }
+        if (curr_len > max_len) {
+            max_len = curr_len;
+            start = temp_start;
+            end = i;
+        }
+    }
+    return max_len;
+}
+\end{lstlisting}

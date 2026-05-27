@@ -1,0 +1,68 @@
+\section{Kiến trúc hệ thống và Thiết kế cấu trúc dữ liệu}
+
+\subsection{Quy trình xử lý dữ liệu (Data Pipeline)}
+Hệ thống được thiết kế theo mô hình luồng dữ liệu một chiều tuyến tính (Pipeline), đảm bảo tính module hóa cao và dễ dàng bảo trì. Quy trình xử lý gồm các bước sau:
+\begin{enumerate}
+    \item \textbf{Đọc dữ liệu (Data Ingestion):} Đọc dữ liệu từ file đầu vào CSV. Phân tích cú pháp từng hàng dữ liệu, chuyển đổi các giá trị khuyết (\texttt{NA}) sang hằng số thực \texttt{NAN}.
+    \item \textbf{Tiền xử lý và chuẩn hóa (Data Preprocessing):} Thực hiện cắt bỏ khoảng trắng (\textit{trim}) tên trạm, định dạng lại các trường thông tin cần thiết.
+    \item \textbf{Thống kê mô tả (Descriptive Statistics):} Tính toán các giá trị thống kê đặc trưng (\textit{Mean, Std, Min, Max}) cho từng trạm đo cụ thể, bỏ qua các giá trị \texttt{NAN}.
+    \item \textbf{Phân tích nâng cao (Advanced Analytics):} Áp dụng thuật toán Kadane để tìm đoạn nhiệt độ cao nhất và thuật toán LIS liên tiếp để tìm xu hướng lượng mưa tăng dần. Sử dụng Prefix Sum 1D để tối ưu hóa việc tính toán lượng mưa tích lũy.
+    \item \textbf{Xuất báo cáo (Data Export):} Kết xuất kết quả thống kê ra file \texttt{station\_report.csv} và các bất thường thời tiết ra file \texttt{anomaly.txt}.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{workflow.png}
+    \caption{Sơ đồ quy trình xử lý dữ liệu (Pipeline) của hệ thống}
+    \label{fig:workflow}
+\end{figure}
+
+\subsection{Thiết kế cấu trúc dữ liệu (Data Structures)}
+Để quản lý dữ liệu hiệu quả và phản ánh chính xác cấu trúc thực tế của một hệ thống trạm đo, chương trình sử dụng mô hình Struct lồng nhau cấp 2 bao gồm ba cấu trúc chính: \texttt{Record}, \texttt{Stats}, và \texttt{Station}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{Weather_station_data_model.png}
+    \caption{Mô hình cấu trúc dữ liệu lồng nhau cấp 2}
+    \label{fig:data_model}
+\end{figure}
+
+\subsubsection{Cấu trúc Record (Bản ghi đo khí tượng)}
+Lưu trữ thông tin chi tiết về các thông số thời tiết đo được vào một mốc thời gian cụ thể:
+\begin{lstlisting}[style=cppstyle, caption=Định nghĩa struct Record]
+struct Record {
+    std::string date;     // Ngày đo (định dạng YYYY-MM-DD)
+    double temp;          // Nhiệt độ (đơn vị: độ C)
+    double humidity;      // Độ ẩm tương đối (đơn vị: %)
+    double rain;          // Lượng mưa (đơn vị: mm)
+};
+\end{lstlisting}
+
+\subsubsection{Cấu trúc Stats (Thông số thống kê)}
+Lưu trữ các kết quả phân tích thống kê mô tả đã qua tính toán của một trạm:
+\begin{lstlisting}[style=cppstyle, caption=Định nghĩa struct Stats]
+struct Stats {
+    double meanTemp, stdTemp; // Trung bình và độ lệch chuẩn nhiệt độ
+    double meanRain, stdRain; // Trung bình và độ lệch chuẩn lượng mưa
+    double minVal, maxVal;     // Giá trị nhiệt độ nhỏ nhất và lớn nhất
+};
+\end{lstlisting}
+
+\subsubsection{Cấu trúc Station (Trạm khí tượng)}
+Cấp quản lý cao nhất của dữ liệu, chứa các thông tin hành chính, danh sách toàn bộ các bản ghi lịch sử và đối tượng thống kê của trạm đó:
+\begin{lstlisting}[style=cppstyle, caption=Định nghĩa struct Station]
+struct Station {
+    std::string id;                  // Mã định danh duy nhất của trạm
+    std::string name;                // Tên trạm khí tượng
+    std::vector<Record> records;     // Danh sách các bản ghi đo khí tượng
+    Stats stats;                     // Các chỉ số thống kê của trạm
+};
+\end{lstlisting}
+
+\subsection{Sơ đồ phân cấp hàm (Functional Hierarchy)}
+Hệ thống tuân thủ chặt chẽ nguyên lý Single Responsibility (Đơn nhiệm) của thiết kế phần mềm sạch. Toàn bộ mã nguồn được chia làm 3 module chính:
+\begin{itemize}
+    \item \textbf{Module IO (\texttt{io.h} / \texttt{io.cpp}):} Đảm nhận tất cả các tương tác đọc ghi với hệ thống tệp tin. Các hàm cốt lõi gồm \texttt{readStationsFromCSV}, \texttt{writeStationReport}, và \texttt{writeAnomalyReport}.
+    \item \textbf{Module Processing (\texttt{processing.h} / \texttt{processing.cpp}):} Chứa toàn bộ logic toán học và các thuật toán tối ưu hóa cốt lõi. Gồm các hàm tính toán thống kê \texttt{calculateStationStats}, chuẩn hóa \texttt{normalizeStationData}, phân loại \texttt{classifyRainLevel}, cùng các hàm thuật toán tối ưu như \texttt{runKadane}, \texttt{runLIS}, \texttt{computePrefixSum}, và \texttt{queryRangeSum}.
+    \item \textbf{Module Main (\texttt{main.cpp}):} Đóng vai trò bộ điều phối (Controller), chịu trách nhiệm thiết lập đường dẫn tệp tin, gọi các module theo tuần tự và kiểm soát luồng hoạt động chính của chương trình.
+\end{itemize}

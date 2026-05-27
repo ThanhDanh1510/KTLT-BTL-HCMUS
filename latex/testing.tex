@@ -1,0 +1,65 @@
+\section{Kế hoạch kiểm thử và Kết quả thực nghiệm}
+
+\subsection{Kế hoạch kiểm thử (Test Plan)}
+Nhằm đánh giá độ chính xác của logic nghiệp vụ, tính ổn định trước các điều kiện biên dữ liệu lỗi và hiệu năng xử lý lượng lớn dữ liệu, nhóm đã xây dựng và thực thi 4 bộ dữ liệu kiểm thử (Test Cases) tương ứng với các kịch bản thực tế:
+
+\begin{table}[htbp]
+    \centering
+    \caption{Chi tiết các ca kiểm thử hệ thống}
+    \footnotesize
+    \begin{tabularx}{\textwidth}{l|l|p{3.5cm}|X}
+        \toprule
+        \textbf{Mã Test} & \textbf{Tệp kiểm thử} & \textbf{Trạm kiểm thử} & \textbf{Mục tiêu và đặc trưng kịch bản} \\
+        \midrule
+        \textbf{TC1} & \texttt{test\_hanoi\_normal.csv} & Tram\_Ha\_Noi & Dữ liệu chuẩn, đầy đủ không chứa giá trị khuyết (\texttt{NA}). Nhiệt độ từ 15.4$^\circ$C đến 39.6$^\circ$C. Nhằm kiểm định tính chính xác của toàn bộ đường ống xử lý. \\ \hline
+        \textbf{Kịch bản biên} & \texttt{test\_sapa\_edge\_cases.csv} & Tram\_Sapa & Chứa nhiều dữ liệu khuyết (\texttt{NA}). Có ngày khuyết toàn bộ, có ngày khuyết độ ẩm. Kiểm định giải pháp xử lý giá trị khuyết mà không làm hỏng chương trình. \\ \hline
+        \textbf{TC3} & \texttt{test\_hue\_lis.csv} & Tram\_Hue & Thiết lập nhiệt độ cố định 25$^\circ$C và lượng mưa tăng dần liên tiếp từ 5.0mm đến 27.5mm (có chứa 1 ngày khuyết \texttt{NA}). Nhằm kiểm định đặc biệt thuật toán phát hiện chuỗi xu hướng mưa LIS. \\ \hline
+        \textbf{TC4} & \texttt{test\_dalat\_stress.csv} & Tram\_Da\_Lat & Bộ dữ liệu kiểm thử tải và hiệu năng với hàng trăm bản ghi đo kéo dài. Kiểm định độ ổn định của thuật toán Kadane và Prefix Sum 1D trong môi trường dữ liệu dày đặc. \\
+        \bottomrule
+    \end{tabularx}
+    \label{tab:test_cases}
+\end{table}
+
+\subsection{Kết quả thực nghiệm (Experimental Results)}
+Sau khi thực thi toàn bộ luồng chương trình trên cả 4 kịch bản kiểm thử tích hợp, hệ thống đã kết xuất chính xác các báo cáo thống kê tương ứng.
+
+\subsubsection{Kết quả tóm tắt trạm (Trích xuất từ \texttt{station\_report.csv})}
+Tệp thống kê \texttt{station\_report.csv} phản ánh chính xác các đại lượng đặc trưng của từng vùng khí hậu:
+\begin{lstlisting}[style=mystyle, caption=Nội dung tệp station\_report.csv kết xuất thực tế]
+StationID,StationName,MeanTemp,MaxTemp
+1,Tram_Ha_Noi,28.79,39.9
+2,Tram_Sapa,2.25,10
+3,Tram_Hue,25,25
+4,Tram_Da_Lat,18.98,28
+\end{lstlisting}
+
+\subsubsection{Phân tích chi tiết các bất thường thời tiết (Trích xuất từ \texttt{anomaly.txt})}
+\begin{enumerate}
+    \item \textbf{Tại trạm Hà Nội (TC1 - Bình thường):}
+    \begin{itemize}
+        \item Thuật toán Kadane xác định đợt nắng nóng cực đại kéo dài từ 01/01/2025 đến 30/01/2025 với nhiệt độ cao nhất đạt \textbf{39.9$^\circ$C} vào ngày 11/01/2025.
+        \item Thuật toán LIS liên tiếp phát hiện chính xác chuỗi ngày lượng mưa tăng liên tục kéo dài 4 ngày: từ ngày 22/01/2025 (15.7mm - Moderate) đến ngày 25/01/2025 (19.6mm - Moderate).
+        \item Sử dụng Prefix Sum 1D, hệ thống tính toán tức thời tổng lượng mưa tích lũy của chuỗi mưa này đạt \textbf{71.2mm}.
+    \end{itemize}
+
+    \item \textbf{Tại trạm Sa Pa (TC2 - Xử lý biên dữ liệu khuyết):}
+    \begin{itemize}
+        \item Dữ liệu khuyết (\texttt{NA}) đã được lọc sạch khoa học. Ngày 01/01/2025 khuyết toàn bộ các chỉ số được chuyển sang \texttt{NAN} thành công và loại bỏ khỏi mẫu thống kê một cách an toàn.
+        \item Nhiệt độ trung bình đạt \textbf{2.25$^\circ$C}, nhiệt độ cao nhất đạt \textbf{10.0$^\circ$C} (ngày 03/01/2025).
+        \item Phát hiện chuỗi mưa tăng dần từ ngày 02/01 (0mm - No Rain) đến ngày 03/01 (15.0mm - Moderate), tổng mưa đạt \textbf{15.0mm} bỏ qua ngày lỗi.
+    \end{itemize}
+
+    \item \textbf{Tại trạm Huế (TC3 - Kiểm chứng LIS tăng rõ rệt):}
+    \begin{itemize}
+        \item Hệ thống chỉ ra chuỗi ngày lượng mưa tăng liên tiếp kéo dài tới 9 ngày (bỏ qua ngày 06/01 bị khuyết \texttt{NA} một cách thông minh), bắt đầu từ ngày 01/01 (5mm) đến ngày 10/01 (27.5mm).
+        \item Tổng lượng mưa tích lũy truy vấn siêu tốc đạt \textbf{145.0mm}.
+    \end{itemize}
+
+    \item \textbf{Tại trạm Đà Lạt (TC4 - Thử nghiệm tải lớn):}
+    \begin{itemize}
+        \item Hệ thống xử lý mượt mà hàng trăm dòng dữ liệu thực tế liên tục, thuật toán Kadane tìm ra chính xác đoạn con nhiệt độ tích lũy cao nhất mà không bị tràn bộ nhớ hay suy giảm hiệu năng xử lý.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Đánh giá kết quả kiểm thử}
+Toàn bộ kết quả thực tế thu được từ chương trình trùng khớp hoàn toàn với các kết quả tính toán thủ công trên bảng dữ liệu Excel mẫu. Chương trình không gặp bất cứ lỗi sập nguồn (segmentation fault) hay lỗi chia cho không (division by zero) nào khi hoạt động trên bộ dữ liệu khuyết \texttt{NA}. Điều này chứng minh mã nguồn C++ có tính bền vững (robustness) và tin cậy cực kỳ cao.

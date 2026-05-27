@@ -1,0 +1,29 @@
+\section{Kết luận và Hướng phát triển tương lai}
+
+\subsection{Tóm tắt kết quả đạt được}
+Dự án \textbf{"Hệ thống phân tích dữ liệu thời tiết nhiều trạm đo"} đã hoàn thành đầy đủ, vượt mức các yêu cầu nghiệp vụ được đề ra cho Bài tập lớn môn Kỹ thuật lập trình. Thông qua việc kết hợp các kỹ thuật lập trình C++ hiện đại và các thuật toán tối ưu, hệ thống đã cung cấp một giải pháp đáng tin cậy trong việc thu nhận, xử lý sạch và trích xuất các bất thường khí tượng.
+
+\subsection{Đánh giá ưu điểm và hạn chế của hệ thống}
+
+\subsubsection{Ưu điểm vượt trội}
+\begin{itemize}
+    \item \textbf{Hiệu năng xử lý tối ưu:} Toàn bộ các thuật toán cốt lõi bao gồm Kadane tìm đoạn nhiệt độ cao nhất, LIS liên tiếp tìm xu hướng mưa và Prefix Sum 1D đều có độ phức tạp thời gian tuyến tính $O(n)$ cực kỳ nhanh, cho phép xử lý dữ liệu quy mô lớn trong thời gian thực.
+    \item \textbf{Khả năng xử lý dữ liệu khuyết bền bỉ:} Việc thiết kế hệ thống xử lý \texttt{NA} thông minh thông qua việc chuyển đổi sang hằng số thực \texttt{NAN} và tự động bỏ qua khi tính toán thống kê giúp chương trình hoạt động vô cùng ổn định, tránh các sai lệch nghiêm trọng.
+    \item \textbf{Kiến trúc Clean Code:} Việc phân chia mã nguồn rõ ràng thành các module \texttt{IO}, \texttt{Processing} và phối hợp tại \texttt{main.cpp} giúp chương trình có tính bảo trì và phát triển nâng cấp rất cao.
+    \item \textbf{Định dạng báo cáo chuẩn hóa:} Kết xuất báo cáo thống kê định dạng CSV tương thích tốt với các công cụ phân tích hiện đại như Python Pandas, Microsoft Excel hay R, trong khi tệp \texttt{anomaly.txt} giúp người dùng nhanh chóng đọc được các biến động cực đoan.
+\end{itemize}
+
+\subsubsection{Hạn chế tồn tại}
+\begin{itemize}
+    \item Hệ thống hoạt động hoàn toàn trên giao diện dòng lệnh (Command Line Interface - CLI), chưa tích hợp giao diện đồ họa (GUI) trực quan nên có thể gây khó khăn cho những người dùng phổ thông không có nền tảng kỹ thuật.
+    \item Phương pháp phát hiện xu hướng mưa LIS hiện đang tập trung vào chuỗi ngày tăng liên tục kề nhau. Trên thực tế, xu hướng thời tiết có thể tăng giảm đan xen cục bộ, đòi hỏi các mô hình lọc nhiễu phức tạp hơn.
+\end{itemize}
+
+\subsection{Hướng phát triển và mở rộng trong tương lai}
+Để nâng cao hơn nữa giá trị thực tiễn và tính năng của phần mềm, nhóm đề xuất một số hướng phát triển tiếp theo:
+\begin{enumerate}
+    \item \textbf{Phát triển giao diện đồ họa (GUI):} Sử dụng các thư viện như Qt C++ hoặc wxWidgets để xây dựng giao diện trực quan, cho phép người dùng chọn tệp CSV bằng hộp thoại trực quan và hiển thị biểu đồ nhiệt độ/lượng mưa trực tiếp trên phần mềm.
+    \item \textbf{Tích hợp đồ thị hóa (Data Visualization):} Viết các script Python bổ trợ sử dụng thư viện \texttt{Matplotlib} hoặc \texttt{Seaborn} để tự động vẽ biểu đồ trực quan hóa dữ liệu ngay sau khi chương trình C++ hoàn thành việc xuất báo cáo.
+    \item \textbf{Mở rộng thuật toán dự báo:} Áp dụng các mô hình học máy (Machine Learning) cơ bản hoặc các phương pháp dự báo chuỗi thời gian như ARIMA để không chỉ phân tích lịch sử mà còn đưa ra các dự báo thời tiết ngắn hạn dựa trên dữ liệu thu thập được.
+    \item \textbf{Tích hợp Hệ quản trị cơ sở dữ liệu:} Thay thế việc đọc ghi tệp CSV thủ công bằng việc kết nối trực tiếp với các cơ sở dữ liệu quan hệ như SQLite hoặc MySQL để tăng cường bảo mật và khả năng quản lý dữ liệu đồng thời từ nhiều nguồn trạm đo tự động trực tuyến.
+\end{enumerate}

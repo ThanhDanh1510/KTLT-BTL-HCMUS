@@ -1,0 +1,124 @@
+\section{Phương pháp thuật toán và Cơ sở lý thuyết}
+
+\subsection{Các phép toán thống kê mô tả và tiền xử lý}
+\subsubsection{Xử lý giá trị khuyết (Missing Values)}
+Trong dữ liệu khí tượng thực tế, hiện tượng khuyết thiếu dữ liệu do lỗi thiết bị đo là không thể tránh khỏi (được ký hiệu là \texttt{NA} trong tệp dữ liệu nguồn). Hệ thống sử dụng giá trị \texttt{NAN} (\textit{Not-a-Number}) tiêu chuẩn của IEEE 754 để đại diện cho dữ liệu khuyết. Khi thực hiện các phép tính thống kê (cộng tổng, tính trung bình, độ lệch chuẩn, so sánh cực trị), hệ thống sẽ bỏ qua các giá trị \texttt{NAN} này để tránh làm sai lệch kết quả phân tích chung.
+
+\subsubsection{Trung bình cộng và Độ lệch chuẩn}
+Công thức tính trung bình cộng ($\mu$) của một chuỗi thông số thời tiết có $N$ bản ghi hợp lệ:
+\begin{equation}
+    \mu = \frac{1}{N} \sum_{i=1}^{N} x_i \quad (x_i \neq \text{NAN})
+\end{equation}
+
+Độ lệch chuẩn ($\sigma$) đo lường mức độ phân tán của dữ liệu xung quanh giá trị trung bình:
+\begin{equation}
+    \sigma = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (x_i - \mu)^2} \quad (x_i \neq \text{NAN})
+\end{equation}
+Nếu trạm chỉ có ít hơn 2 bản ghi hợp lệ, độ lệch chuẩn được đặt là \texttt{NAN} (hoặc xuất ra \texttt{NA} trên tệp tin kết quả).
+
+\subsection{Thuật toán Kadane phát hiện đợt nhiệt độ cao bất thường}
+Để xác định khoảng thời gian liên tục mà ở đó thời tiết có xu hướng nắng nóng gay gắt nhất, hệ thống giải quyết bài toán \textbf{Maximum Subarray Sum} bằng thuật toán Kadane.
+Thuật toán Kadane hoạt động dựa trên phương pháp Quy hoạch động với độ phức tạp thời gian cực kỳ tối ưu $O(n)$.
+
+Ý tưởng chính: Gọi $f(i)$ là tổng lớn nhất của dãy con kết thúc tại chỉ số $i$. Ta có công thức truy hồi:
+\begin{equation}
+    f(i) = \max(x_i, f(i-1) + x_i)
+\end{equation}
+
+\begin{algorithm}[H]
+\caption{Thuật toán Kadane tìm đoạn nhiệt độ cao nhất}
+\label{alg:kadane}
+\begin{algorithmic}[1]
+\Procedure{RunKadane}{$A$, $N$, \textbf{out} $start$, \textbf{out} $end$}
+    \State $max\_so\_far \gets -\infty$
+    \State $max\_ending\_here \gets 0$
+    \State $temp\_start \gets 0$
+    \State $start \gets 0, end \gets 0$
+    \For{$i \gets 0$ \textbf{to} $N-1$}
+        \If{$A[i]$ là \texttt{NAN}} 
+            \State $max\_ending\_here \gets 0$ \Comment{Ngắt chuỗi liên tục tại giá trị lỗi}
+            \State $temp\_start \gets i + 1$
+            \State \textbf{continue}
+        \EndIf
+        \State $max\_ending\_here \gets max\_ending\_here + A[i]$
+        \If{$max\_ending\_here > max\_so\_far$}
+            \State $max\_so\_far \gets max\_ending\_here$
+            \State $start \gets temp\_start$
+            \State $end \gets i$
+        \EndIf
+        \If{$max\_ending\_here < 0$}
+            \State $max\_ending\_here \gets 0$
+            \State $temp\_start \gets i + 1$
+        \EndIf
+    \EndFor
+    \State \Return $max\_so\_far$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Thuật toán LIS liên tiếp phát hiện xu hướng lượng mưa tăng dần}
+Để phát hiện khoảng thời gian có xu hướng lượng mưa tăng liên tục (cảnh báo nguy cơ mưa lũ dồn dập), hệ thống áp dụng thuật toán tìm dãy con tăng liên tiếp dài nhất (một biến thể thực tế của Longest Increasing Subsequence - LIS trên các phần tử kề nhau).
+Thuật toán duyệt qua mảng trong $O(n)$ và cập nhật độ dài chuỗi tăng liên tiếp hiện tại.
+
+\begin{algorithm}[H]
+\caption{Thuật toán LIS liên tiếp phát hiện xu hướng lượng mưa}
+\label{alg:lis}
+\begin{algorithmic}[1]
+\Procedure{RunLISContinuous}{$R$, $N$, \textbf{out} $start$, \textbf{out} $end$}
+    \State $max\_len \gets 1$, $curr\_len \gets 1$
+    \State $start \gets 0, end \gets 0$
+    \State $temp\_start \gets 0$
+    \For{$i \gets 1$ \textbf{to} $N-1$}
+        \If{$R[i]$ hoặc $R[i-1]$ là \texttt{NAN}}
+            \State $curr\_len \gets 1$
+            \State $temp\_start \gets i$
+            \State \textbf{continue}
+        \EndIf
+        \If{$R[i] > R[i-1]$}
+            \State $curr\_len \gets curr\_len + 1$
+            \If{$curr\_len > max\_len$}
+                \State $max\_len \gets curr\_len$
+                \State $start \gets temp\_start$
+                \State $end \gets i$
+            \EndIf
+        \Else
+            \State $curr\_len \gets 1$
+            \State $temp\_start \gets i$
+        \EndIf
+    \EndFor
+    \State \Return $max\_len$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Cấu trúc dữ liệu Prefix Sum 1D (Mảng cộng dồn)}
+Sau khi tìm được đoạn ngày có lượng mưa tăng dần dài nhất $[start, end]$ bằng thuật toán LIS liên tiếp, hệ thống cần tính nhanh tổng lượng mưa tích lũy trong đoạn này. Nhằm tránh việc lặp lại phép cộng gây lãng phí tài nguyên tính toán (nhất là khi có nhiều truy vấn), hệ thống xây dựng mảng cộng dồn 1D (\textit{Prefix Sum 1D}).
+
+Gọi $P$ là mảng cộng dồn của mảng lượng mưa hợp lệ $R$, trong đó phần tử khuyết được xử lý hoặc bỏ qua. Với mảng $R$ đã lọc sạch \texttt{NAN}:
+\begin{equation}
+    P[i] = \sum_{k=0}^{i} R[k]
+\end{equation}
+Công thức xây dựng mảng cộng dồn trong $O(n)$:
+\begin{equation}
+    P[i] = P[i-1] + R[i] \quad (P[0] = R[0])
+\end{equation}
+Khi đó, truy vấn tổng lượng mưa trong đoạn bất kỳ $[L, R]$ được thực hiện trong thời gian hằng số $O(1)$:
+\begin{equation}
+    \text{Sum}(L, R) = P[R] - P[L-1] \quad (\text{với } L > 0)
+\end{equation}
+
+\subsection{Đánh giá độ phức tạp thuật toán}
+\begin{table}[H]
+    \centering
+    \caption{Bảng phân tích độ phức tạp của các thuật toán trong hệ thống}
+    \begin{tabularx}{\textwidth}{|l|X|X|}
+        \hline
+        \textbf{Thuật toán/Phép toán} & \textbf{Độ phức tạp thời gian} & \textbf{Mục đích sử dụng} \\ \hline
+        Tính toán thống kê & $O(n)$ & Tính $\mu$, $\sigma$, Min, Max trạm \\ \hline
+        Kadane & $O(n)$ & Phát hiện chuỗi nhiệt độ cao nhất \\ \hline
+        LIS liên tiếp & $O(n)$ & Phát hiện xu hướng mưa tăng dần \\ \hline
+        Prefix Sum 1D & $O(n)$ để dựng, $O(1)$ truy vấn & Tối ưu hóa tính tổng lượng mưa đoạn \\ \hline
+    \end{tabularx}
+    \label{tab:complexity}
+\end{table}
+Trong đó, $n$ đại diện cho số lượng bản ghi khí tượng thời gian thực của trạm đo. Có thể thấy, tất cả thuật toán đều đạt hiệu năng tối ưu tuyến tính $O(n)$, đảm bảo hệ thống phản hồi cực nhanh ngay cả trên tập dữ liệu lớn.

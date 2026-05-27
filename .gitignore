@@ -18,3 +18,17 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# === LaTeX Auxiliary Files ===
+*.aux
+*.log
+*.toc
+*.out
+*.pdf
+*.synctex.gz
+*.bbl
+*.bcf
+*.blg
+*.run.xml
+*.fdb_latexmk
+*.fls

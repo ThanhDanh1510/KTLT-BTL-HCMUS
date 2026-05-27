@@ -1,0 +1,20 @@
+\section{Mở đầu}
+\subsection{Giới thiệu đề tài}
+Trong bối cảnh biến đổi khí hậu ngày càng phức tạp, việc phân tích và xử lý dữ liệu khí tượng thủy văn đóng vai trò đặc biệt quan trọng trong công tác dự báo thời tiết, cảnh báo thiên tai và quy hoạch phát triển bền vững. Đề tài \textbf{"Hệ thống phân tích dữ liệu thời tiết nhiều trạm đo"} được phát triển nhằm xây dựng một giải pháp hiệu quả, tối ưu trong việc xử lý, làm sạch và phân tích các chỉ số thời tiết cốt lõi (nhiệt độ, độ ẩm, lượng mưa) từ chuỗi dữ liệu thực tế tại nhiều trạm đo khác nhau.
+
+Hệ thống được thiết kế bằng ngôn ngữ lập trình C++ theo định hướng tối ưu hóa bộ nhớ và tốc độ xử lý dữ liệu dạng bảng lớn. Đặc biệt, chương trình được tích hợp các mô hình toán học và thuật toán tối ưu để phát hiện các hiện tượng thời tiết bất thường (anomalies).
+
+\subsection{Mục tiêu và phạm vi của hệ thống}
+\textbf{Mục tiêu chính:}
+\begin{itemize}
+    \item Đọc và phân tích chính xác dữ liệu từ các tệp tin lưu trữ định dạng CSV (\textit{Comma-Separated Values}) chứa dữ liệu chuỗi thời gian của nhiều trạm đo khí tượng.
+    \item Chuẩn hóa dữ liệu thô, loại bỏ các ký tự thừa, khoảng trắng và xử lý một cách khoa học các giá trị bị khuyết (\textit{Missing values} kí hiệu là \texttt{NA}) dưới dạng \texttt{NAN} (\textit{Not-a-Number}) để tránh làm lệch các phép đo thống kê.
+    \item Tính toán hiệu quả các chỉ số thống kê đặc trưng bao gồm: Trung bình cộng (\textit{Mean}), Độ lệch chuẩn (\textit{Standard Deviation}), Giá trị nhỏ nhất (\textit{Min}) và Giá trị lớn nhất (\textit{Max}) cho từng trạm.
+    \item Phát hiện các đợt nắng nóng hoặc bất thường nhiệt độ bằng cách tìm đoạn ngày liên tiếp có tổng nhiệt độ tích lũy cao nhất (sử dụng thuật toán Kadane tối ưu $O(n)$).
+    \item Xác định xu hướng biến đổi lượng mưa thông qua việc phát hiện chuỗi ngày có lượng mưa tăng dần liên tiếp (tư duy Quy hoạch động LIS liên tiếp).
+    \item Tính toán hiệu quả tổng lượng mưa tích lũy trong các đoạn bất thường bằng cấu trúc mảng cộng dồn 1D (\textit{Prefix Sum 1D}) trong thời gian truy vấn hằng số $O(1)$.
+    \item Xuất báo cáo tổng quan định dạng CSV và báo cáo bất thường định dạng TXT phục vụ công tác giám sát.
+\end{itemize}
+
+\textbf{Phạm vi áp dụng:}
+Hệ thống xử lý tốt các bộ dữ liệu khí tượng có quy mô lớn, các trạm khí tượng đo đạc nhiều ngày liên tục. Giải pháp này phù hợp để tích hợp vào các phần mềm quản lý trạm khí tượng thủy văn ở mức độ cơ sở và làm tiền đề cho các ứng dụng phân tích dữ liệu lớn.
