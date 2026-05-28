@@ -58,66 +58,55 @@ Dưới đây là một số đoạn mã nguồn thực tế được trích xu�
 \subsubsection{Cài đặt thuật toán Kadane}
 \begin{lstlisting}[style=cppstyle, caption=Hàm runKadane trong processing.cpp]
 double runKadane(const std::vector<double>& data, int& start, int& end) {
-    double max_so_far = -9999999.0; // Hoặc -INFINITY
-    double max_ending_here = 0.0;
-    int temp_start = 0;
-    start = 0; end = 0;
-    bool hasValid = false;
+    if (data.empty()) return 0;
 
-    for (size_t i = 0; i < data.size(); ++i) {
-        if (std::isnan(data[i])) {
-            max_ending_here = 0.0;
-            temp_start = i + 1;
-            continue;
+    double max_so_far = data[0];
+    double max_ending_here = data[0];
+    int temp_start = 0;
+    
+    start = 0;
+    end = 0;
+
+    for (size_t i = 1; i < data.size(); i++) {
+        if (data[i] > max_ending_here + data[i]) {
+            max_ending_here = data[i];
+            temp_start = i;
+        } else {
+            max_ending_here += data[i];
         }
-        hasValid = true;
-        max_ending_here += data[i];
 
         if (max_ending_here > max_so_far) {
             max_so_far = max_ending_here;
             start = temp_start;
             end = i;
         }
-        if (max_ending_here < 0.0) {
-            max_ending_here = 0.0;
-            temp_start = i + 1;
-        }
     }
-    return hasValid ? max_so_far : NAN;
+    return max_so_far;
 }
 \end{lstlisting}
 
 \subsubsection{Cài đặt thuật toán LIS liên tiếp và Prefix Sum}
 \begin{lstlisting}[style=cppstyle, caption=Hàm runLIS trong processing.cpp]
 int runLIS(const std::vector<double>& data, int& start, int& end) {
-    int max_len = 0;
-    int curr_len = 0;
-    int temp_start = 0;
-    start = -1; end = -1;
+    size_t n = data.size();
+    if (n == 0) return 0;
+    int maxL = 1, currentL = 1;
+    int tempStart = 0;
+    start = 0; end = 0;
 
-    for (size_t i = 0; i < data.size(); ++i) {
-        if (std::isnan(data[i])) {
-            curr_len = 0;
-            temp_start = i + 1;
-            continue;
-        }
-        if (curr_len == 0) {
-            curr_len = 1;
-            temp_start = i;
-        } else {
-            if (data[i] > data[i - 1] && !std::isnan(data[i - 1])) {
-                curr_len++;
-            } else {
-                curr_len = 1;
-                temp_start = i;
+    for (size_t i = 1; i < n; i++) {
+        if (data[i] > data[i - 1]) {
+            currentL++;
+            if (currentL > maxL) {
+                maxL = currentL;
+                start = tempStart;
+                end = i;
             }
-        }
-        if (curr_len > max_len) {
-            max_len = curr_len;
-            start = temp_start;
-            end = i;
+        } else {
+            currentL = 1;
+            tempStart = i;
         }
     }
-    return max_len;
+    return maxL;
 }
 \end{lstlisting}

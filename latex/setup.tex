@@ -37,8 +37,7 @@
 \definecolor{cpptype}{rgb}{0.16, 0.47, 0.68}     % Màu xanh cho kiểu dữ liệu
 \definecolor{cppfunc}{rgb}{0.6, 0.3, 0.1}        % Màu nâu/cam cho tên hàm
 \definecolor{cppvar}{rgb}{0.1, 0.5, 0.5}         % Màu teal cho tên biến
-\definecolor{matlabfunc}{rgb}{0.0, 0.5, 0.0}     % Màu xanh lá cho hàm matlab
-\definecolor{matlabvar}{rgb}{0.75, 0.1, 0.1}     % Màu đỏ sẫm cho biến matlab
+
 
 % Định nghĩa Style chung
 \lstdefinestyle{mystyle}{
@@ -112,19 +111,7 @@
     classoffset=0, % Reset lại bậc offset để không ảnh hưởng style khác
 }
 
-\lstdefinestyle{matlabstyle}{
-    style=mystyle,
-    language=Matlab,
-    % Nhóm 1: Các hàm hệ thống của MATLAB -> Màu matlabfunc
-    classoffset=1,
-    morekeywords={audioread, reshape, svd, figure, uipanel, subplot, plot, title, grid, guidata, uicontrol, audioplayer, play, stop, audiowrite, msgbox, errordlg, str2double, isnan, round, get, axes},
-    keywordstyle=\color{matlabfunc}\bfseries,
-    % Nhóm 2: Các biến quan trọng đặc thù của bài toán -> Màu matlabvar
-    classoffset=2,
-    morekeywords={U, S, V, A, y, y1, Fs, k},
-    keywordstyle=\color{matlabvar}\bfseries,
-    classoffset=0 % Reset về mặc định
-}
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 % Cấu hình Header/Footer
