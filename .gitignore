@@ -24,7 +24,7 @@ Thumbs.db
 *.log
 *.toc
 *.out
-*.pdf
+
 *.synctex.gz
 *.bbl
 *.bcf

@@ -36,7 +36,7 @@ Thuật toán Kadane hoạt động dựa trên phương pháp Quy hoạch độ
     \State $start \gets 0, end \gets 0$
     \For{$i \gets 0$ \textbf{to} $N-1$}
         \If{$A[i]$ là \texttt{NAN}} 
-            \State $max\_ending\_here \gets 0$ \Comment{Ngắt chuỗi liên tục tại giá trị lỗi}
+            \State $max\_ending\_here \gets 0$
             \State $temp\_start \gets i + 1$
             \State \textbf{continue}
         \EndIf
